@@ -1,4 +1,3 @@
-_id,singkat,hasil
 1,abis,habis
 2,accent,tekanan
 3,accept,terima
@@ -101,7 +100,7 @@ _id,singkat,hasil
 100,bet,banget
 101,beter,better
 102,between,antara
-103,Bgm,bagaimana
+103,bgm,bagaimana
 104,bgmn,bagaimana
 105,bgmna,bagaimana
 106,bgn,bangun
@@ -3773,3 +3772,5 @@ _id,singkat,hasil
 3772,hi,hai
 3773,hayu,ayo
 3774,bapa,bapak
+3775,lmt,lemot
+3776,lmot,lemot
