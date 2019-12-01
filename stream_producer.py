@@ -18,6 +18,7 @@ with open('./data/tweets.txt', 'r') as file:
     tweets = file.read().split(':::')
     number_of_tweets = len(tweets)
     while True:
-        tweet = tweets[random.randint(0, number_of_tweets)]
-        server_socket.send(tweet.encode('utf-8'))
+        tweet = tweets[random.randint(0, number_of_tweets - 1)]
+        print(tweet)
+        conn.send(tweet.encode('utf-8'))
         time.sleep(1)
