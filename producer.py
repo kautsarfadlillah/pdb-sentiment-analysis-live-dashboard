@@ -6,8 +6,8 @@ from pymongo import MongoClient
 client = MongoClient('localhost', 27017)
 database = client['pdb']
 table = database['sentiment']
-pos_word = database['pos_word']
-neg_word = database['neg_word']
+pos_word = database['positive_words']
+neg_word = database['negative_words']
 
 WORDS = ['abcd', 'spark', 'streaming', 'test']
 while True:
