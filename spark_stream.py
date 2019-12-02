@@ -162,12 +162,12 @@ def clean_tweets(data):
     words = [word.translate(str.maketrans('', '', string.punctuation)) for word in words if len(word.translate(str.maketrans('', '', string.punctuation))) > 0]
 
     # change abbreviated word to its original word
-    words = [str.lower(KEY_NORM[word]) if word in set(KEY_NORM.keys()) else word for word in words]
+    words = (' '.join([str.lower(KEY_NORM[word]) if word in set(KEY_NORM.keys()) else word for word in words])).split()
     
     # stemming
     words = [STEMMER.stem(word) for word in words]
 
-    # remove stopwords and space
+    # remove stopwords
     words = [word for word in words if word not in STOPWORDS]
 
     clean_tweet = ' '.join(words)  

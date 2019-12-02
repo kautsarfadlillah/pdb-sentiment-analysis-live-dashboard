@@ -19,7 +19,7 @@ table = database['sentiment']
 table_pos = database['positive_words']
 table_neg = database['negative_words']
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+external_stylesheets = ['https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css']
 
 app_colors = {
     'background': '#0C0F0A',
@@ -36,13 +36,12 @@ app.layout = html.Div(
     html.P('ini oke banget loh!', style={'font-family':"verdana", 'color':"#000000"}), html.Hr()],
     style = {'text-align': 'center'} ),
     html.Div([
-        html.Div(id='live-update-text'),
         dcc.Graph(id='live-update-graph'),
         dcc.Interval(
             id='interval-component',
             
             # Graph updated every 10 seconds
-            interval=10*1000, # in milliseconds
+            interval=5*1000, # in milliseconds
             n_intervals=0
         )
     ]),
@@ -51,23 +50,23 @@ app.layout = html.Div(
     ),
      dcc.Interval(
         id='sentiment-pie-update',
-        interval= 2*1000
+        interval= 5*1000
     ),
      dcc.Interval(
         id='recent-tweets-update',
-        interval=2*1000
+        interval=5*1000
     ),
     html.Div(className='row', children=[html.Div(id="positive-table", className='col s12 m6 16')]
     ),
      dcc.Interval(
         id='recent-positive-words-update',
-        interval=2*1000
+        interval=5*1000
     ),
     html.Div(className='row', children=[html.Div(id="negative-table", className='col s12 m6 16')]
     ),
      dcc.Interval(
         id='recent-negative-words-update',
-        interval=2*1000
+        interval=5*1000
     ),
     ]
     )
@@ -95,8 +94,10 @@ def generate_table(df):
 @app.callback(Output('recent-tweets-table', 'children'),
 [Input('recent-tweets-update', 'n_intervals')])
 def recent_tweets(a):
-    df = pd.DataFrame(table.find().sort('date', -1).limit(10))
+    df = pd.DataFrame(list(table.find().sort('date', -1).limit(10)))
     df = df.drop(['_id'], axis=1)
+    df = df[['date', 'tweet', 'sentiment']]
+    df['date'] = df['date'].apply(lambda dt: dt.strftime("%d %b %Y, %H:%M:%S"))
     recent_table = dash_table.DataTable(
         id='table_sentiment',
         columns=[{"name":i, "id":i} for i in df.columns],
@@ -143,11 +144,11 @@ def update_pie_chart(x):
     neg = 0
     net = 0
     for obj in table.find():
-        if obj['sentiment'] > 0.2 :
+        if obj['sentiment'] > 0.05 :
             pos+=1
-        elif obj['sentiment'] <= 0.2 and obj['sentiment'] >= -0.2 :
+        elif obj['sentiment'] <= 0.05 and obj['sentiment'] >= -0.05 :
             net+=1
-        elif obj['sentiment'] < -0.2:
+        elif obj['sentiment'] < -0.05:
             neg+=1
     labels = ['Positive','Negative', 'Neutral']
     values = [pos,neg,net]
@@ -162,34 +163,12 @@ def update_pie_chart(x):
         font={'color':app_colors['text']}, plot_bgcolor = app_colors['background'],
         paper_bgcolor = app_colors['background'], showlegend=True)}
 
-@app.callback(Output('live-update-text', 'children'),
-              [Input('interval-component', 'n_intervals')])
-def update_metrics(n):
-    positive = 0
-    negative = 0
-    neutral = 0
-
-    twitter_data = table.find()
-    for tweet in twitter_data:
-        if tweet['sentiment'] > 0.0:
-            positive += 1
-        elif tweet['sentiment'] < 0.0:
-            negative += 1
-        else:
-            neutral += 1
-
-    style = {'padding': '5px', 'fontSize': '16px'}
-
-    return [
-        html.Span('Positive: {}, Negative: {}, NTRL: {}'.format(positive, negative, neutral), style=style)
-    ]
-
 # Multiple components can update everytime interval gets fired.
 @app.callback(Output('live-update-graph', 'figure'),
               [Input('interval-component', 'n_intervals')])
 def update_graph_live(n):
     def roundup(x):
-        return int(math.ceil(x / 10.0)) * 10
+        return int(math.ceil(x / 20.0)) * 20
     data = {
         'time': [],
         'positive': [],
@@ -206,27 +185,32 @@ def update_graph_live(n):
         positive_count = 0
         negative_count = 0
         while tweet_index < len(twitter_data) and twitter_data[tweet_index]['date'] < time_pointer:
-            if twitter_data[tweet_index]['sentiment'] > 0.0:
+            if twitter_data[tweet_index]['sentiment'] > 0.05:
                 positive_count += 1
-            elif twitter_data[tweet_index]['sentiment'] < 0.0:
+            elif twitter_data[tweet_index]['sentiment'] < 0.05:
                 negative_count += 1
             tweet_index += 1
         
-        if positive_count > 0 or negative_count > 0:
-            data['time'].append(time_pointer)
-            data['positive'].append(positive_count)
-            data['negative'].append(negative_count)
-        time_pointer = time_pointer + datetime.timedelta(seconds=30)
+        data['time'].append(time_pointer)
+        data['positive'].append(positive_count)
+        data['negative'].append(negative_count)
+        time_pointer = time_pointer + datetime.timedelta(seconds=20)
     
+    start_index = 0
+    for i in range(len(data['positive'])):
+        if data['positive'][i] > 0 or data['negative'][i] > 0:
+            start_index = i
+            break
+
     trace1 = go.Scatter (
-        x=data['time'][::-1],
-        y=data['positive'][::-1],
+        x=data['time'][start_index:][::-1],
+        y=data['positive'][start_index:][::-1],
         name='Positive Sentiment'
     )
 
     trace2 = go.Scatter (
-        x=data['time'][::-1],
-        y=data['negative'][::-1],
+        x=data['time'][start_index:][::-1],
+        y=data['negative'][start_index:][::-1],
         name='Negative Sentiment'
     )
 
@@ -249,13 +233,14 @@ def update_graph_live(n):
         ),
         yaxis=go.layout.YAxis(
             title=go.layout.yaxis.Title(
-                text='Sentiment',
+                text='Sentiment Count',
                 font=dict(
                     family='Courier New, monospace',
                     size=18,
                     color='#7f7f7f'
                 )
-            )
+            ),
+            range=[0, 50]
         )
     )
     fig = go.Figure(data=data, layout=layout)

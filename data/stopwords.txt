@@ -56,8 +56,6 @@ begitukah
 begitulah
 begitupun
 sebegitu
-belum
-belumlah
 sebelum
 sebelumnya
 sebenarnya
@@ -78,9 +76,7 @@ boleh
 bolehkah
 bolehlah
 buat
-bukan
 bukankah
-bukanlah
 bukannya
 cuma
 percuma
@@ -137,9 +133,6 @@ inilah
 itu
 itukah
 itulah
-jangan
-jangankan
-janganlah
 jika
 jikalau
 juga
@@ -341,9 +334,7 @@ tetapi
 setiap
 tiap
 setidaknya
-tidak
 tidakkah
-tidaklah
 toh
 waduh
 wah

@@ -10,9 +10,9 @@ auth = OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 api = API(auth)
 
-max_tweets = 1000
+max_tweets = 5000
 tweets = []
-for tweet in Cursor(api.search, q='fore', tweet_mode='extended', lang='id').items(max_tweets):
+for tweet in Cursor(api.search, q='gojek', tweet_mode='extended', lang='id').items(max_tweets):
     try:
         tweets.append(tweet.retweeted_status.full_text)
     except:
@@ -24,4 +24,4 @@ with open('./data/tweets.txt', 'w') as file:
         if i == len(tweets) - 1:
             print(tweet, file=file)
         else:
-            print(tweet + ':::', file=file)
+            print(tweet + '|||||', file=file)
