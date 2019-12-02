@@ -29,7 +29,7 @@ app_colors = {
     'someothercolor':'#FF206E',
 }
 
-app = dash.Dash(__name__)
+app = dash.Dash(__name__,external_stylesheets=external_stylesheets)
 app.layout = html.Div(
     [html.Div(className='container-fluid', 
     children=[html.H1('Gojek Live Sentiment Analysis on Twitter', style={'font-family':"verdana", 'color':"#000000"} ),
@@ -45,8 +45,8 @@ app.layout = html.Div(
             n_intervals=0
         )
     ]),
-    html.Div(className='row', children=[html.Div(dcc.Graph(id='sentiment-pie', animate=False), className='col-6'),
-    html.Div(id="recent-tweets-table", className='col-6')]
+    html.Div(className='row', children=[html.Div(dcc.Graph(id='sentiment-pie', animate=False), className='col-lg-6'),
+    html.Div(id="recent-tweets-table", className='col-lg-6')]
     ),
      dcc.Interval(
         id='sentiment-pie-update',
@@ -56,13 +56,12 @@ app.layout = html.Div(
         id='recent-tweets-update',
         interval=5*1000
     ),
-    html.Div(className='row', children=[html.Div(id="positive-table", className='col s12 m6 16')]
+    html.Div(className='row',  children=[html.Div(dcc.Graph(id="positive-table", animate=False), className='col-lg-6'),
+    html.Div(dcc.Graph(id="negative-table", animate=False), className='col-lg-6')]
     ),
      dcc.Interval(
         id='recent-positive-words-update',
         interval=5*1000
-    ),
-    html.Div(className='row', children=[html.Div(id="negative-table", className='col s12 m6 16')]
     ),
      dcc.Interval(
         id='recent-negative-words-update',
@@ -70,26 +69,24 @@ app.layout = html.Div(
     ),
     ]
     )
-@app.callback(Output('positive-table', 'children'),
+@app.callback(Output('positive-table', 'figure'),
 [Input('recent-positive-words-update', 'n_intervals')])
-def update_recent_tweets(x):
+def top_positive(x):
     df = DataFrame(list(table_pos.find().sort('count', -1).limit(5)))
     df = df.drop(['_id'], axis=1)
-    return generate_table(df)
+    return generate_graph(df)
 
-@app.callback(Output('negative-table', 'children'),
+@app.callback(Output('negative-table', 'figure'),
 [Input('recent-negative-words-update', 'n_intervals')])
-def update_recent_tweets(x):
+def top_negative(x):
     df = DataFrame(list(table_neg.find().sort('count', -1).limit(5)))
     df = df.drop(['_id'], axis=1)
-    return generate_table(df)
+    return generate_graph(df)
 
-def generate_table(df):
-    positive_table = dash_table.DataTable(
-        id='table_sentiment',
-        columns=[{"name":i, "id":i} for i in df.columns],
-        data=df.to_dict("rows"))
-    return positive_table
+def generate_graph(df):
+    data = go.Bar(x=df['count'], y=df['word'], orientation='h')
+    layout = go.Layout(xaxis={'title':'Jumlah'},yaxis={'title':'Kata'})
+    return go.Figure(data=data, layout=layout)
 
 @app.callback(Output('recent-tweets-table', 'children'),
 [Input('recent-tweets-update', 'n_intervals')])
@@ -160,8 +157,8 @@ def update_pie_chart(x):
 
     return {"data":[trace],'layout' : go.Layout(
         title='Positive vs Negative vs Netral sentiment for gojek',
-        font={'color':app_colors['text']}, plot_bgcolor = app_colors['background'],
-        paper_bgcolor = app_colors['background'], showlegend=True)}
+        font={'color':app_colors['sentiment-plot']}, plot_bgcolor = app_colors['sentiment-plot'],
+        showlegend=True)}
 
 # Multiple components can update everytime interval gets fired.
 @app.callback(Output('live-update-graph', 'figure'),
