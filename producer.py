@@ -20,6 +20,7 @@ while True:
             'sentiment': random.choice([1, -1]) * random.random()
         }
     )
+    time.sleep(2)
     
     # positive word
     word = WORDS[random.randint(0, len(WORDS) - 1)]
