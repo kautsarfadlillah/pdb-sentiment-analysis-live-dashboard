@@ -40,7 +40,7 @@ app.layout = html.Div(
         dcc.Interval(
             id='interval-component',
             
-            # Graph updated every 10 seconds
+            # Graph updated every 5 seconds
             interval=5*1000, # in milliseconds
             n_intervals=0
         )
@@ -90,7 +90,7 @@ def generate_graph(df, tipe: str):
         warna = 'rgb(220,53,69)'
     else:
         warna = 'rgb(0,123,255)'
-    data = go.Bar(x=df['count'], y=df['word'], orientation='h',marker_color=warna)
+    data = go.Bar(x=df['count'][::-1], y=df['word'][::-1], orientation='h',marker_color=warna)
     layout = go.Layout(title=go.layout.Title(
             text='Top 5 '+ tipe + ' Word',
             xref='paper',

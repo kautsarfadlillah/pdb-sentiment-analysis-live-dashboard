@@ -10,7 +10,7 @@ auth = OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 api = API(auth)
 
-max_tweets = 5000
+max_tweets = 2000
 tweets = []
 for tweet in Cursor(api.search, q='gojek', tweet_mode='extended', lang='id').items(max_tweets):
     try:
