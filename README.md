@@ -1,3 +1,12 @@
+### How to Run
+- Run HDFS and Mongo
+
+- Run tweet_stream.py and stream_producer.py
+
+- Run spark_stream.py
+
+```spark-submit --master local[*] --name "Live Sentiment Analysis" --conf spark.streaming.receiver.writeAheadLog.enable=true spark_stream.py```
+
 ### Tech Stack
 
 - Hadoop HDFS
