@@ -17,7 +17,7 @@ while True:
 
     try:
         with open('./data/tweets.txt', 'r') as file:
-            tweets = file.read().split(':::')
+            tweets = file.read().split('|||||')
             number_of_tweets = len(tweets)
             while True:
                 tweet = tweets[random.randint(0, number_of_tweets - 1)]

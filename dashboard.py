@@ -156,7 +156,7 @@ def update_pie_chart(x):
     line=dict(color=app_colors['background'], width=2)))
 
     return {"data":[trace],'layout' : go.Layout(
-        title='Positive vs Negative vs Netral sentiment for gojek',
+        title='Positive vs Negative vs Neutral Sentiment for Gojek',
         font={'color':app_colors['sentiment-plot']}, plot_bgcolor = app_colors['sentiment-plot'],
         showlegend=True)}
 
@@ -199,6 +199,8 @@ def update_graph_live(n):
             start_index = i
             break
 
+    max_yaxis = max(50, max(data['positive']), max(data['negative']))
+
     trace1 = go.Scatter (
         x=data['time'][start_index:][::-1],
         y=data['positive'][start_index:][::-1],
@@ -214,7 +216,7 @@ def update_graph_live(n):
     data = [trace1, trace2]
     layout = go.Layout(
         title=go.layout.Title(
-            text='Live Sentiment for \'Gojek\'',
+            text='Live Sentiment for Gojek',
             xref='paper',
             x=0
         ),
@@ -237,7 +239,7 @@ def update_graph_live(n):
                     color='#7f7f7f'
                 )
             ),
-            range=[0, 50]
+            range=[0, max_yaxis]
         )
     )
     fig = go.Figure(data=data, layout=layout)
