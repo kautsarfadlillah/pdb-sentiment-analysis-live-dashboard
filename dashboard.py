@@ -33,9 +33,9 @@ app = dash.Dash(__name__,external_stylesheets=external_stylesheets)
 app.layout = html.Div(
     [html.Div(className='container-fluid', 
     children=[html.H1('Gojek Live Sentiment Analysis on Twitter', style={'font-family':"verdana", 'color':"#000000"} ),
-    html.P('ini oke banget loh!', style={'font-family':"verdana", 'color':"#000000"}), html.Hr()],
+    html.P('Developed by Group 4', style={'font-family':"verdana", 'color':"#000000"}), html.Hr()],
     style = {'text-align': 'center'} ),
-    html.Div([
+    html.Div(className='container-fluid',children=[
         dcc.Graph(id='live-update-graph'),
         dcc.Interval(
             id='interval-component',
@@ -45,8 +45,9 @@ app.layout = html.Div(
             n_intervals=0
         )
     ]),
-    html.Div(className='row', children=[html.Div(dcc.Graph(id='sentiment-pie', animate=False), className='col-lg-6'),
-    html.Div(id="recent-tweets-table", className='col-lg-6')]
+    html.Div(className='row', children=[html.Div(dcc.Graph(id="positive-table", animate=False), className='col-lg-4'),
+    html.Div(dcc.Graph(id='sentiment-pie', animate=False), className='col-lg-4'),
+    html.Div(dcc.Graph(id="negative-table", animate=False), className='col-lg-4')]
     ),
      dcc.Interval(
         id='sentiment-pie-update',
@@ -56,8 +57,8 @@ app.layout = html.Div(
         id='recent-tweets-update',
         interval=5*1000
     ),
-    html.Div(className='row',  children=[html.Div(dcc.Graph(id="positive-table", animate=False), className='col-lg-6'),
-    html.Div(dcc.Graph(id="negative-table", animate=False), className='col-lg-6')]
+    html.Div(className='container',  children=[html.H4('Recent Tweets related to Gojek'),html.Div(id="recent-tweets-table")
+    ]
     ),
      dcc.Interval(
         id='recent-positive-words-update',
@@ -74,18 +75,27 @@ app.layout = html.Div(
 def top_positive(x):
     df = DataFrame(list(table_pos.find().sort('count', -1).limit(5)))
     df = df.drop(['_id'], axis=1)
-    return generate_graph(df)
+    return generate_graph(df, 'Positive')
 
 @app.callback(Output('negative-table', 'figure'),
 [Input('recent-negative-words-update', 'n_intervals')])
 def top_negative(x):
     df = DataFrame(list(table_neg.find().sort('count', -1).limit(5)))
     df = df.drop(['_id'], axis=1)
-    return generate_graph(df)
+    return generate_graph(df, 'Negative')
 
-def generate_graph(df):
-    data = go.Bar(x=df['count'], y=df['word'], orientation='h')
-    layout = go.Layout(xaxis={'title':'Jumlah'},yaxis={'title':'Kata'})
+def generate_graph(df, tipe: str):
+    warna = ''
+    if tipe == 'Negative':
+        warna = 'rgb(220,53,69)'
+    else:
+        warna = 'rgb(0,123,255)'
+    data = go.Bar(x=df['count'], y=df['word'], orientation='h',marker_color=warna)
+    layout = go.Layout(title=go.layout.Title(
+            text='Top 5 '+ tipe + ' Word',
+            xref='paper',
+            x=0
+        ), xaxis={'title':'Jumlah'},yaxis={'title':'Kata'})
     return go.Figure(data=data, layout=layout)
 
 @app.callback(Output('recent-tweets-table', 'children'),
@@ -118,18 +128,19 @@ def recent_tweets(a):
                         style_data_conditional=[
                             {
                                 "if" : {
-                                    'filter_query': '{sentiment} < 0'
+                                    'filter_query': '{sentiment} > 0.05'
                                     },
-                                    'backgroundColor' : '#FAD9D9',
+                                    'backgroundColor' : '#4da3ff',
                                     'color': 'black',
                                     },
                                     {
                                         "if" : {
-                                            'filter_query': '{sentiment} > 0'
+                                            'filter_query': '{sentiment} < -0.05'
                                             },
-                                            'backgroundColor' : '#C4F8C3',
+                                            'backgroundColor' : '#e77681',
                                             'color': 'black',
                                             },
+                                            
                                             ]
                                             )
     return recent_table
@@ -149,7 +160,7 @@ def update_pie_chart(x):
             neg+=1
     labels = ['Positive','Negative', 'Neutral']
     values = [pos,neg,net]
-    colors = ['#007F25', '#800000', '#41EAD4' ]
+    colors = ['#007bff', '#DC3545', '#6C757D' ]
 
     trace = go.Pie(labels=labels, values=values,hoverinfo='label+percent', textinfo='value', 
     textfont=dict(size=20, color=app_colors['text']),marker=dict(colors=colors, 
