@@ -7,7 +7,7 @@
 
 ```spark-submit --master local[*] --name "Live Sentiment Analysis" --conf spark.streaming.receiver.writeAheadLog.enable=true spark_stream.py```
 
-### Tech Stack
+### Tech Stacks
 
 - Hadoop HDFS
 
@@ -22,24 +22,24 @@
 
 **mongo_checker.py**    : mongodb viewer and deleter option
 
-**spark_stream.py**     : spark streaming (kalkulasi sentimen dan kata positif/negatif)
+**spark_stream.py**     : spark streaming (calculate sentiments and positive/negative words)
 
-**stream_producer.py**  : membaca file data/tweets.txt untuk melakukan stream buatan
+**stream_producer.py**  : read data/tweets.txt file to produce fake stream
 
-**tweet_fetcher.py**    : script untuk mengisi file data/tweets.txt
+**tweet_fetcher.py**    : script to get some tweets and store to data/tweets.txt
 
-**tweet_stream.py**     : script untuk stream data dari Twitter API
+**tweet_stream.py**     : script to stream data from Twitter API
 
 ---
 ### Data
-**key_norm.csv**        : file kumpulan mapping kata singkatan ke kata asli
+**key_norm.csv**        : contains mapping from brief words to its real words
 
-**negations.txt**       : file kumpulan kata negasi
+**negations.txt**       : contains negation words
 
-**negatives.tsv**       : file kumpulan mapping kata negatif dengan besaran sentimen
+**negatives.tsv**       : contains negative words with its weight
 
-**positives.tsv**       : file kumpulan mapping kata positif dengan besaran sentimen
+**positives.tsv**       : contains positive words with its weight
 
-**stopwords.txt**       : file kumpulan stopwords
+**stopwords.txt**       : contains stopwords
 
-**tweets.txt**          : file kumpulan tweet yang digunakan untuk membuat stream buatan
+**tweets.txt**          : contains tweets to produce fake stream
